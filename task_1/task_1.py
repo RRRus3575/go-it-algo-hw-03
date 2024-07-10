@@ -5,9 +5,9 @@ import shutil
 
 init(autoreset=True)
 
-parent_folder_path = Path('.')
+parent_folder_path = Path('./task_1/test')
 
-new = r'C:\Users\Руслан\Documents\GitHub\go-it-algo-hw-03\task_1\new'
+new = Path('./task_1/new')
 
 def copy_and_sort_files(path, destination_directory='dist'):
     new_directory = Path(destination_directory)
@@ -15,7 +15,8 @@ def copy_and_sort_files(path, destination_directory='dist'):
     try:
         if not new_directory.exists() or not new_directory.is_dir():
             print(Fore.RED + 'Dist does not exist. Creating it.')
-            new_directory.mkdir(parents=True, exist_ok=True)
+            new_directory = path.parent / 'dist'
+            os.makedirs(new_directory, exist_ok=True)
 
         for element in path.iterdir():
             if element.is_dir():
