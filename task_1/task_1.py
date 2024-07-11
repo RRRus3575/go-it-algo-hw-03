@@ -1,45 +1,53 @@
-import shutil
+from pathlib import Path
+from colorama import Fore, Style, init
 import os
-from colorama import init, Fore, Style
+import shutil
 
-# Инициализация colorama
 init(autoreset=True)
 
-def copy_file(src, dst):
+parent_folder_path = Path('./task_1/test')
+
+new = Path('./task_1/new')
+
+def copy_and_sort_files(path, destination_directory='dist'):
+    new_directory = Path(destination_directory)
+
     try:
-        shutil.copy2(src, dst)
-        print(Fore.GREEN + f"File '{src}' successfully copied to '{dst}'")
-    except FileNotFoundError:
-        print(Fore.RED + f"File '{src}' not found.")
-    except PermissionError:
-        print(Fore.RED + f"Permission denied when copying file '{src}' to '{dst}'.")
+        if not new_directory.exists() or not new_directory.is_dir():
+            print(Fore.RED + 'Dist does not exist. Creating it.')
+            new_directory = path.parent / 'dist'
+            os.makedirs(new_directory, exist_ok=True)
+
+        for element in path.iterdir():
+            if element.is_dir():
+                print(Fore.BLUE + f'Parse folder: This is folder - {element.name}')
+                try:
+                    copy_and_sort_files(element, new_directory)
+                except Exception as e:
+                    print(Fore.RED + f'Failed to process directory {element}: {e}')
+            elif element.is_file():
+                print(Fore.MAGENTA + f'Parse folder: This is file - {element.name}')
+                extension = element.suffix.lstrip('.').lower()
+                if not extension:
+                    extension = 'no_extension'
+
+                folder_path = new_directory / extension
+                try:
+                    folder_path.mkdir(parents=True, exist_ok=True)
+                except Exception as e:
+                    print(Fore.RED + f'Failed to create directory {folder_path}: {e}')
+                    continue
+
+                try:
+                    shutil.copy(element, folder_path / element.name)
+                    print(Fore.GREEN + f'Copied {element} to {folder_path / element.name}')
+                except Exception as e:
+                    print(Fore.RED + f'Failed to copy file {element} to {folder_path}: {e}')
     except Exception as e:
-        print(Fore.RED + f"Error copying file '{src}' to '{dst}': {e}")
+        print(Fore.RED + f'Failed to process path {path}: {e}')
 
-def copy_files_in_directory(src_dir, dst_dir):
-    try:
-        if not os.path.exists(dst_dir):
-            os.makedirs(dst_dir)
-        for item in os.listdir(src_dir):
-            src_item = os.path.join(src_dir, item)
-            dst_item = os.path.join(dst_dir, item)
-            if os.path.isfile(src_item):
-                copy_file(src_item, dst_item)
-            elif os.path.isdir(src_item):
-                copy_files_in_directory(src_item, dst_item)
-    except Exception as e:
-        print(Fore.RED + f"Error copying directory '{src_dir}' to '{dst_dir}': {e}")
 
-def main():
-    src_dir = input("Enter the source directory: ")
-    dst_dir = input("Enter the destination directory: ")
-    
-    if os.path.exists(src_dir):
-        print(Fore.BLUE + f"Starting to copy files from '{src_dir}' to '{dst_dir}'")
-        copy_files_in_directory(src_dir, dst_dir)
-        print(Fore.BLUE + f"Finished copying files from '{src_dir}' to '{dst_dir}'")
-    else:
-        print(Fore.RED + f"Source directory '{src_dir}' does not exist.")
-
-if __name__ == "__main__":
-    main()
+try:
+    copy_and_sort_files(parent_folder_path, new)
+except Exception as e:
+    print(Fore.RED + f'Failed to start processing: {e}')
