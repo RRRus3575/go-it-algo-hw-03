@@ -1,53 +1,30 @@
-from pathlib import Path
-from colorama import Fore, Style, init
-import os
-import shutil
+import turtle
 
-init(autoreset=True)
+def koch_curve(t, order, size, colors):
+    if order == 0:
+        t.forward(size)
+    else:
+        for angle in [60, -120, 60, 0]:
+            koch_curve(t, order - 1, size / 3, colors)
+            t.left(angle)
+            t.color(colors[(order - 1) % len(colors)])
 
-parent_folder_path = Path('./task_1/test')
+def draw_koch_snowflake(order, size=300, background_color="black"):
+    colors = ["cyan", "magenta", "yellow", "lime", "white"]
+    window = turtle.Screen()
+    window.bgcolor(background_color)
 
-new = Path('./task_1/new')
+    t = turtle.Turtle()
+    t.speed(0)
+    t.penup()
+    t.goto(-size / 2, size / 3)
+    t.pendown()
+    t.color(colors[order % len(colors)])
 
-def copy_and_sort_files(path, destination_directory='dist'):
-    new_directory = Path(destination_directory)
+    for _ in range(3):
+        koch_curve(t, order, size, colors)
+        t.right(120)
 
-    try:
-        if not new_directory.exists() or not new_directory.is_dir():
-            print(Fore.RED + 'Dist does not exist. Creating it.')
-            new_directory = path.parent / 'dist'
-            os.makedirs(new_directory, exist_ok=True)
+    window.mainloop()
 
-        for element in path.iterdir():
-            if element.is_dir():
-                print(Fore.BLUE + f'Parse folder: This is folder - {element.name}')
-                try:
-                    copy_and_sort_files(element, new_directory)
-                except Exception as e:
-                    print(Fore.RED + f'Failed to process directory {element}: {e}')
-            elif element.is_file():
-                print(Fore.MAGENTA + f'Parse folder: This is file - {element.name}')
-                extension = element.suffix.lstrip('.').lower()
-                if not extension:
-                    extension = 'no_extension'
-
-                folder_path = new_directory / extension
-                try:
-                    folder_path.mkdir(parents=True, exist_ok=True)
-                except Exception as e:
-                    print(Fore.RED + f'Failed to create directory {folder_path}: {e}')
-                    continue
-
-                try:
-                    shutil.copy(element, folder_path / element.name)
-                    print(Fore.GREEN + f'Copied {element} to {folder_path / element.name}')
-                except Exception as e:
-                    print(Fore.RED + f'Failed to copy file {element} to {folder_path}: {e}')
-    except Exception as e:
-        print(Fore.RED + f'Failed to process path {path}: {e}')
-
-
-try:
-    copy_and_sort_files(parent_folder_path, new)
-except Exception as e:
-    print(Fore.RED + f'Failed to start processing: {e}')
+draw_koch_snowflake(3)
