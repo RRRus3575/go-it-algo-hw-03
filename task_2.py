@@ -27,4 +27,4 @@ def draw_koch_snowflake(order, size=300, background_color="black"):
 
     window.mainloop()
 
-draw_koch_snowflake(3)
+draw_koch_snowflake(5)
