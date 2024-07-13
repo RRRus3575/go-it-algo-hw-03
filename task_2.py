@@ -1,3 +1,4 @@
+import argparse
 import turtle
 
 def koch_curve(t, order, size, colors):
@@ -27,4 +28,12 @@ def draw_koch_snowflake(order, size=300, background_color="black"):
 
     window.mainloop()
 
-draw_koch_snowflake(5)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Draw a Koch snowflake with specified recursion level.")
+    parser.add_argument("order", type=int, help="The recursion level of the Koch snowflake")
+    parser.add_argument("--size", type=int, default=300, help="The size of the Koch snowflake")
+    parser.add_argument("--background_color", type=str, default="black", help="Background color of the window")
+
+    args = parser.parse_args()
+
+    draw_koch_snowflake(args.order, args.size, args.background_color)
