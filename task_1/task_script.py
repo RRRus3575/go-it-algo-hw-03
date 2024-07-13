@@ -4,7 +4,6 @@ from colorama import Fore, Style, init
 import os
 import shutil
 
-# Ініціалізація Colorama
 init(autoreset=True)
 
 def copy_and_sort_files(source_path, destination_directory='dist'):
